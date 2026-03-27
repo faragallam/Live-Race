@@ -100,5 +100,5 @@ export default function StudentView() {
         </div>
       </div>
     </div>
-  );
+  )
 }
