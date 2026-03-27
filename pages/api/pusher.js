@@ -1,6 +1,5 @@
 import Pusher from 'pusher';
 
-// This safely loads your secret keys from Vercel
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID,
   key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
@@ -10,18 +9,19 @@ const pusher = new Pusher({
 });
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { eventName, data } = req.body;
+  const { eventName, data } = req.body;
 
-    try {
-      // This broadcasts the message to the whole classroom on the "race-channel"
-      await pusher.trigger('race-channel', eventName, data);
-      res.status(200).json({ message: 'Signal sent successfully!' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Failed to send signal.' });
-    }
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
+  // Safety Check: If any key is missing, tell us exactly which one
+  if (!process.env.PUSHER_APP_ID || !process.env.PUSHER_SECRET) {
+    console.error("CRITICAL ERROR: Server-side keys (APP_ID or SECRET) are missing in Vercel!");
+    return res.status(500).json({ error: "Missing server keys" });
+  }
+
+  try {
+    await pusher.trigger('race-channel', eventName, data);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("PUSHER ERROR:", error);
+    res.status(500).json({ error: error.message });
   }
 }
