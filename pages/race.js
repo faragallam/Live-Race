@@ -87,5 +87,5 @@ export default function RacePage() {
         }
       `}</style>
     </div>
-  )
+  );
 }
