@@ -9,16 +9,16 @@ const pusher = new Pusher({
 });
 
 export default async function handler(req, res) {
-  const { eventName, data } = req.body;
-
-  if (!process.env.PUSHER_APP_ID || !process.env.PUSHER_SECRET) {
-    return res.status(500).json({ error: "Missing server keys" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
+    const { eventName, data } = req.body;
     await pusher.trigger('race-channel', eventName, data);
     res.status(200).json({ success: true });
   } catch (error) {
+    console.error("Pusher Server Error:", error);
     res.status(500).json({ error: error.message });
   }
 }
