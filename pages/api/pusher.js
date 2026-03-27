@@ -1,27 +1,23 @@
-import Pusher from 'pusher';
-
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-  useTLS: true,
-});
-
-export default async function handler(req, res) {
-  const { eventName, data } = req.body;
-
-  // Safety Check: If any key is missing, tell us exactly which one
-  if (!process.env.PUSHER_APP_ID || !process.env.PUSHER_SECRET) {
-    console.error("CRITICAL ERROR: Server-side keys (APP_ID or SECRET) are missing in Vercel!");
-    return res.status(500).json({ error: "Missing server keys" });
-  }
-
-  try {
-    await pusher.trigger('race-channel', eventName, data);
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("PUSHER ERROR:", error);
-    res.status(500).json({ error: error.message });
+{
+  "name": "alfarabi-race",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.3.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3"
   }
 }
