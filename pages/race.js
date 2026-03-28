@@ -3,22 +3,28 @@ import Pusher from 'pusher-js';
 
 export default function RacePage() {
   const [players, setPlayers] = useState([]);
+  const [connection, setConnection] = useState('Initializing...');
 
   useEffect(() => {
-    // This check prevents errors if the keys are missing
-    if (!process.env.NEXT_PUBLIC_PUSHER_APP_KEY) {
-      console.error("Pusher key is missing!");
+    const key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY;
+    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+
+    if (!key) {
+      setConnection('❌ Error: Pusher Key Missing');
       return;
     }
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_APP_KEY, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'mt1',
-    });
-
+    const pusher = new Pusher(key, { cluster: cluster || 'ap2' });
     const channel = pusher.subscribe('race-channel');
+
+    setConnection('Searching for signals...');
+
     channel.bind('player-joined', (data) => {
+      setConnection('🏎️ Signal received!');
       setPlayers((prev) => [...new Set([...prev, data.name])]);
     });
+
+    pusher.connection.bind('connected', () => setConnection('✅ Race Track Online'));
 
     return () => {
       pusher.unsubscribe('race-channel');
@@ -27,14 +33,17 @@ export default function RacePage() {
   }, []);
 
   return (
-    <div style={{ padding: '40px', textAlign: 'center', backgroundColor: '#eee', minHeight: '100vh' }}>
-      <h1>Al Farabi Race</h1>
-      <div style={{ background: '#222', color: '#fff', padding: '20px', borderRadius: '10px' }}>
-        {players.length > 0 ? (
-          players.map((p, i) => <div key={i}>🏎️ {p}</div>)
-        ) : (
-          <p>Waiting for the race to start...</p>
-        )}
+    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial', background: '#111', minHeight: '100vh', color: 'white' }}>
+      <h1>Al Farabi Racing Dashboard</h1>
+      <p style={{ color: '#aaa' }}>Status: {connection}</p>
+      
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center', marginTop: '40px' }}>
+        {players.map((name, i) => (
+          <div key={i} style={{ background: '#fff', color: '#333', padding: '20px', borderRadius: '10px', fontSize: '24px', fontWeight: 'bold' }}>
+            🏎️ {name}
+          </div>
+        ))}
+        {players.length === 0 && <p>Waiting for students to join...</p>}
       </div>
     </div>
   );
