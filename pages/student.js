@@ -17,21 +17,22 @@ export default function StudentPage() {
 
       if (res.ok) {
         setStatus('✅ Joined successfully! Look at the board.');
+        setName('');
       } else {
-        const data = await res.json().catch(() => ({ error: "Server did not respond properly" }));
-        setStatus(`❌ Error ${res.status}: ${data.error}`);
+        const data = await res.json();
+        setStatus(`❌ Error: ${data.error}`);
       }
     } catch (err) {
-      setStatus(`❌ Network error: ${err.message}`);
+      setStatus('❌ Network error.');
     }
   };
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'sans-serif' }}>
-      <h1>Join Al Farabi Race</h1>
+      <h1>Join the Race</h1>
       <input 
         value={name} 
-        onChange={e => setName(e.target.value)} 
+        onChange={(e) => setName(e.target.value)} 
         placeholder="Enter your name" 
         style={{ padding: '12px', fontSize: '16px', borderRadius: '5px', border: '1px solid #ccc' }} 
       />
@@ -41,7 +42,7 @@ export default function StudentPage() {
         style={{ padding: '12px 25px', fontSize: '16px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}>
         Join Now
       </button>
-      <p style={{ marginTop: '20px', fontWeight: 'bold', color: '#d93025' }}>{status}</p>
+      <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{status}</p>
     </div>
   );
 }
