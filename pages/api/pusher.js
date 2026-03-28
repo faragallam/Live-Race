@@ -1,25 +1,32 @@
-const Pusher = require("pusher");
+import Pusher from 'pusher';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: "Only POST allowed" });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const pusher = new Pusher({
-      appId: process.env.PUSHER_APP_ID,
-      key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
-      secret: process.env.PUSHER_SECRET,
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "ap2",
-      useTLS: true,
-    });
+  // Next.js requires the server Pusher instance to be configured exactly like this
+  const pusher = new Pusher({
+    appId: "1965684",
+    key: "47a06f363c46114ec3eb",
+    secret: process.env.PUSHER_SECRET, 
+    cluster: "ap2",
+    useTLS: true,
+  });
 
-    await pusher.trigger("race-channel", "player-joined", {
-      name: req.body.name || "Anonymous Driver",
+  try {
+    const playerName = req.body.name;
+    
+    if (!playerName) {
+      return res.status(400).json({ error: "Name is required" });
+    }
+
+    await pusher.trigger('race-channel', 'player-joined', {
+      name: playerName
     });
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    return res.status(500).json({ error: error.message || "Pusher connection failed" });
+    return res.status(500).json({ error: error.message });
   }
 }
