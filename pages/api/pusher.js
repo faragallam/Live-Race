@@ -1,6 +1,10 @@
 const Pusher = require("pusher");
 
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: "Only POST allowed" });
+  }
+
   try {
     const pusher = new Pusher({
       appId: "1965684",
@@ -14,8 +18,9 @@ export default async function handler(req, res) {
       name: req.body.name || "Anonymous Driver",
     });
 
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: "Server crashed" });
+    // This sends the exact Pusher error back to the student page
+    return res.status(500).json({ error: error.message || "Pusher connection failed" });
   }
 }
