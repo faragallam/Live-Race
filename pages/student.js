@@ -2,43 +2,45 @@ import React, { useState } from 'react';
 
 export default function StudentPage() {
   const [name, setName] = useState('');
-  const [msg, setMsg] = useState('');
+  const [status, setStatus] = useState('');
 
-  const join = async () => {
+  const joinRace = async () => {
     if (!name) return;
-    setMsg('Connecting...');
+    setStatus('Sending...');
     
     try {
       const res = await fetch('/api/pusher', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventName: 'player-joined', data: { name } }),
+        body: JSON.stringify({ name: name })
       });
 
       if (res.ok) {
-        setMsg('✅ Success! Joined the race.');
+        setStatus('✅ Success!');
       } else {
-        const errorData = await res.json();
-        setMsg(`❌ Failed: ${res.status} - ${errorData.error || 'Check Keys'}`);
+        setStatus('❌ Error: ' + res.status);
       }
     } catch (err) {
-      setMsg('❌ Network Error');
+      setStatus('❌ Network Error');
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial' }}>
-      <h1>Al Farabi English Race</h1>
+    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+      <h2>Join the Race</h2>
       <input 
         value={name} 
         onChange={(e) => setName(e.target.value)} 
-        placeholder="Type your name" 
-        style={{ padding: '15px', fontSize: '18px' }} 
+        placeholder="Enter your name"
+        style={{ padding: '12px', fontSize: '16px', marginBottom: '15px', borderRadius: '5px', border: '1px solid #ccc' }}
       />
-      <button onClick={join} style={{ padding: '15px', marginLeft: '10px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}>
-        Join Race
+      <br/>
+      <button 
+        onClick={joinRace} 
+        style={{ padding: '12px 25px', fontSize: '16px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}>
+        Join Now
       </button>
-      <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{msg}</p>
+      <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{status}</p>
     </div>
   );
 }
