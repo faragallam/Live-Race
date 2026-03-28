@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 
 export default function StudentPage() {
   const [name, setName] = useState('');
-  const [joined, setJoined] = useState(false);
+  const [status, setStatus] = useState('');
 
   const joinRace = async () => {
     if (!name) return alert("Please enter your name");
+    setStatus('Sending...');
     
     try {
       const response = await fetch('/api/pusher', {
@@ -18,36 +19,34 @@ export default function StudentPage() {
       });
 
       if (response.ok) {
-        setJoined(true);
+        setStatus('✅ Joined! Check the big screen.');
+      } else {
+        const err = await response.json();
+        setStatus('❌ Error: ' + err.error);
       }
     } catch (error) {
-      console.error("Error joining:", error);
+      setStatus('❌ Connection failed.');
     }
   };
 
   return (
-    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif' }}>
-      {!joined ? (
-        <div>
-          <h1>Join the Al Farabi Race</h1>
-          <input 
-            type="text" 
-            placeholder="Enter your name" 
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ padding: '10px', fontSize: '16px', borderRadius: '5px' }}
-          />
-          <br /><br />
-          <button 
-            onClick={joinRace}
-            style={{ padding: '10px 20px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px' }}
-          >
-            Join Race!
-          </button>
-        </div>
-      ) : (
-        <h1>✅ You are in the race, {name}! Look at the big screen.</h1>
-      )}
+    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial' }}>
+      <h1>Join the Race</h1>
+      <input 
+        type="text" 
+        placeholder="Your Name" 
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        style={{ padding: '15px', fontSize: '18px', width: '80%', maxWidth: '300px' }}
+      />
+      <br /><br />
+      <button 
+        onClick={joinRace}
+        style={{ padding: '15px 30px', fontSize: '18px', cursor: 'pointer', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}
+      >
+        Join Now
+      </button>
+      <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{status}</p>
     </div>
   );
 }
