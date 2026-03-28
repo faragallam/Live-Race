@@ -1,8 +1,6 @@
-const Pusher = require('pusher');
+const Pusher = require("pusher");
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(200).json({ message: 'API active' });
-
   try {
     const pusher = new Pusher({
       appId: "1965684",
@@ -12,13 +10,12 @@ export default async function handler(req, res) {
       useTLS: true,
     });
 
-    await pusher.trigger('race-channel', 'player-joined', {
-      name: req.body.name || "Unknown Driver"
+    await pusher.trigger("race-channel", "player-joined", {
+      name: req.body.name || "Anonymous Driver",
     });
-    
+
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Crash Details:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Server crashed" });
   }
 }
