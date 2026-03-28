@@ -1,9 +1,7 @@
 const Pusher = require("pusher");
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: "Only POST allowed" });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: "Only POST allowed" });
 
   try {
     const pusher = new Pusher({
@@ -14,11 +12,15 @@ export default async function handler(req, res) {
       useTLS: true,
     });
 
-    const playerName = req.body.name || "Unknown Student";
+    // Instead of just "player-joined", we now accept any event type you send
+    const { event, data } = req.body;
 
-    await pusher.trigger("race-channel", "player-joined", {
-      name: playerName
-    });
+    if (!event || !data) {
+      return res.status(400).json({ error: "Missing event or data" });
+    }
+
+    // Broadcast the event to everyone listening on 'race-channel'
+    await pusher.trigger("race-channel", event, data);
 
     return res.status(200).json({ success: true });
   } catch (error) {
