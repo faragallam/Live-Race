@@ -16,12 +16,13 @@ export default function StudentPage() {
       });
 
       if (res.ok) {
-        setStatus('✅ Joined successfully!');
+        setStatus('✅ Joined successfully! Look at the board.');
       } else {
-        setStatus('❌ Failed to join.');
+        const data = await res.json().catch(() => ({ error: "Server did not respond properly" }));
+        setStatus(`❌ Error ${res.status}: ${data.error}`);
       }
     } catch (err) {
-      setStatus('❌ Network error.');
+      setStatus(`❌ Network error: ${err.message}`);
     }
   };
 
@@ -40,7 +41,7 @@ export default function StudentPage() {
         style={{ padding: '12px 25px', fontSize: '16px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}>
         Join Now
       </button>
-      <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{status}</p>
+      <p style={{ marginTop: '20px', fontWeight: 'bold', color: '#d93025' }}>{status}</p>
     </div>
   );
 }
