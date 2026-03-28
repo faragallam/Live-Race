@@ -15,10 +15,16 @@ export default async function handler(req, res) {
 
   try {
     const { eventName, data } = req.body;
+    
+    // Validate that we actually have the data
+    if (!eventName || !data) {
+      return res.status(400).json({ error: "Missing eventName or data" });
+    }
+
     await pusher.trigger('race-channel', eventName, data);
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Pusher Server Error:", error);
-    res.status(500).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 }
