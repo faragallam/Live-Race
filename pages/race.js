@@ -3,28 +3,14 @@ import Pusher from 'pusher-js';
 
 export default function RacePage() {
   const [players, setPlayers] = useState([]);
-  const [connection, setConnection] = useState('Initializing...');
 
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY;
-    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
-
-    if (!key) {
-      setConnection('❌ Error: Pusher Key Missing');
-      return;
-    }
-
-    const pusher = new Pusher(key, { cluster: cluster || 'ap2' });
+    const pusher = new Pusher('47a06f363c46114ec3eb', { cluster: 'ap2' });
     const channel = pusher.subscribe('race-channel');
-
-    setConnection('Searching for signals...');
-
+    
     channel.bind('player-joined', (data) => {
-      setConnection('🏎️ Signal received!');
-      setPlayers((prev) => [...new Set([...prev, data.name])]);
+      setPlayers((prev) => [...prev, data.name]);
     });
-
-    pusher.connection.bind('connected', () => setConnection('✅ Race Track Online'));
 
     return () => {
       pusher.unsubscribe('race-channel');
@@ -33,17 +19,16 @@ export default function RacePage() {
   }, []);
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial', background: '#111', minHeight: '100vh', color: 'white' }}>
-      <h1>Al Farabi Racing Dashboard</h1>
-      <p style={{ color: '#aaa' }}>Status: {connection}</p>
-      
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center', marginTop: '40px' }}>
+    <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif', background: '#111', color: 'white', minHeight: '100vh' }}>
+      <h1>Live Race Dashboard</h1>
+      <div style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+        {players.length === 0 ? <p style={{ color: '#888' }}>Waiting for students...</p> : null}
+        
         {players.map((name, i) => (
-          <div key={i} style={{ background: '#fff', color: '#333', padding: '20px', borderRadius: '10px', fontSize: '24px', fontWeight: 'bold' }}>
+          <div key={i} style={{ fontSize: '24px', padding: '15px 30px', background: '#fff', color: '#000', borderRadius: '8px', width: '80%', maxWidth: '400px' }}>
             🏎️ {name}
           </div>
         ))}
-        {players.length === 0 && <p>Waiting for students to join...</p>}
       </div>
     </div>
   );
