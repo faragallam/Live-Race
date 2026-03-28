@@ -5,7 +5,13 @@ export default function RacePage() {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    const pusher = new Pusher('47a06f363c46114ec3eb', { cluster: 'ap2' });
+    const key = process.env.NEXT_PUBLIC_PUSHER_APP_KEY;
+    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'ap2';
+    
+    // Safety check so it doesn't break if Vercel is slow to load keys
+    if (!key) return;
+
+    const pusher = new Pusher(key, { cluster: cluster });
     const channel = pusher.subscribe('race-channel');
     
     channel.bind('player-joined', (data) => {
