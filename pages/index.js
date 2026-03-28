@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function TeacherControl() {
   const [theme, setTheme] = useState('alfarabi');
   const [mode, setMode] = useState('race');
+  const router = useRouter();
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -12,7 +14,8 @@ export default function TeacherControl() {
   };
 
   const startGame = () => {
-    alert(`Starting ${mode} mode with the ${theme} theme!`);
+    // This physically moves you to the Race screen and passes your theme/mode!
+    router.push(`/race?theme=${theme}&mode=${mode}`);
   };
 
   return (
